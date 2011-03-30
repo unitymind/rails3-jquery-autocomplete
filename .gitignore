@@ -22,3 +22,6 @@ tmp
 ## PROJECT::SPECIFIC
 .bundle
 .rvmrc
+
+## RUBYMINE
+.idea

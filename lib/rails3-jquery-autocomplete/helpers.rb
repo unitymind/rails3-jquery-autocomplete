@@ -75,6 +75,31 @@ module Rails3JQueryAutocomplete
       get_autocomplete_items(parameters)
     end
 
+    def get_autocomplete_scope(implementation, parameters)
+      model = parameters[:model]
+      options = parameters[:options]
+      scope = parameters[:scope]
+      filter_by = parameters[:filter_by]
+      scope_rel = nil
+
+      case implementation
+        when :mongoid then
+        when :activerecord then
+          unless filter_by.blank?
+            puts filter_by
+            puts options[:filter_by]
+            puts model.class.to_s + ' ' + model.scopes.keys.inspect
+            puts scope
+            if !options[:filter_by].blank? && model.scopes.has_key?(options[:filter_by])
+              scope_rel = model.send(options[:filter_by], filter_by)
+            elsif !scope.blank? && model.scopes.has_key?(scope.to_sym)
+              scope_rel = model.send(scope.to_sym, filter_by)
+            end
+          end
+      end
+      scope_rel
+    end
+
     #
     # Can be overriden to return or filter however you like
     # the objects to be shown by autocomplete
@@ -91,14 +116,20 @@ module Rails3JQueryAutocomplete
       limit = get_autocomplete_limit(options)
       implementation = get_implementation(model)
       order = get_autocomplete_order(implementation, method, options)
+      scope = get_autocomplete_scope(implementation, parameters)
 
       case implementation
         when :mongoid
           search = (is_full_search ? '.*' : '^') + term + '.*'
           items = model.where(method.to_sym => /#{search}/i).limit(limit).order_by(order)
         when :activerecord
-          items = model.where(["LOWER(#{method}) LIKE ?", "#{(is_full_search ? '%' : '')}#{term.downcase}%"]) \
+          if scope.nil?
+            items = model.where(["LOWER(#{method}) LIKE ?", "#{(is_full_search ? '%' : '')}#{term.downcase}%"]) \
             .limit(limit).order(order)
+          else
+            items = scope.where(["LOWER(#{model.table_name.to_s + '.' + method.to_s}) LIKE ?", "#{(is_full_search ? '%' : '')}#{term.downcase}%"]) \
+            .limit(limit).order(model.table_name.to_s + '.' + order)
+          end
       end
     end
 
