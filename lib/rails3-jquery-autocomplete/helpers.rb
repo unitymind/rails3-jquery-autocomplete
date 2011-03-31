@@ -86,10 +86,6 @@ module Rails3JQueryAutocomplete
         when :mongoid then
         when :activerecord then
           unless filter_by.blank?
-            puts filter_by
-            puts options[:filter_by]
-            puts model.class.to_s + ' ' + model.scopes.keys.inspect
-            puts scope
             if !options[:filter_by].blank? && model.scopes.has_key?(options[:filter_by])
               scope_rel = model.send(options[:filter_by], filter_by)
             elsif !scope.blank? && model.scopes.has_key?(scope.to_sym)
