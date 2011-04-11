@@ -1,11 +1,6 @@
 module ActionView
   module Helpers
     module FormHelper
-      alias_method :original_text_field, :text_field
-      def text_field(object_name, method, options = {})
-        original_text_field(object_name, method, rename_autocomplete_option(options))
-      end
-
       # Returns an input tag of the "text" type tailored for accessing a specified attribute (identified by +method+) and
       # that is populated with jQuery's autocomplete plugin.
       #
@@ -14,17 +9,12 @@ module ActionView
       #   # => <input type="text" id="post_title" name="post[title]" size="20" value="#{@post.title}"  data-autocomplete="author/autocomplete"/>
       #
       def autocomplete_field(object_name, method, source, options ={})
-        options[:autocomplete] = source
-        text_field(object_name, method, options)
+        options["data-autocomplete"] = source
+        text_field(object_name, method, rewrite_autocomplete_option(options))
       end
     end
 
     module FormTagHelper
-      alias_method :original_text_field_tag, :text_field_tag
-      def text_field_tag(name, value = nil, options = {})
-        original_text_field_tag(name, value, rename_autocomplete_option(options))
-      end
-
       # Creates a standard text field that can be populated with jQuery's autocomplete plugin
       #
       # ==== Examples
@@ -32,8 +22,8 @@ module ActionView
       #   # => <input id="address" name="address" size="75" type="text" value="" data-autocomplete="address/autocomplete"/>
       #
       def autocomplete_field_tag(name, value, source, options ={})
-        options[:autocomplete] = source
-        text_field_tag(name, value, options)
+        options["data-autocomplete"] = source
+        text_field_tag(name, value, rewrite_autocomplete_option(options))
       end
     end
 
@@ -42,8 +32,8 @@ module ActionView
     # data-autocomplete key
     #
     private
-    def rename_autocomplete_option(options)
-      options["data-autocomplete"] = options.delete(:autocomplete)
+    def rewrite_autocomplete_option(options)
+      options["data-update-elements"] = JSON.generate(options.delete :update_elements) if options[:update_elements]
       options
     end
   end

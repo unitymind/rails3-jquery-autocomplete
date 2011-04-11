@@ -1,6 +1,5 @@
-require 'test/unit'
 require 'rubygems'
-gem 'rails', '>=3.0.0.rc'
+require 'bundler/setup'
 
 $LOAD_PATH.unshift(File.join(File.dirname(__FILE__), '..', 'lib'))
 $LOAD_PATH.unshift(File.dirname(__FILE__))
@@ -10,7 +9,6 @@ ENV["RAILS_ENV"] = "test"
 require 'rails/all'
 require 'mongoid'
 require 'shoulda'
-require 'redgreen'
 require 'rails/test_help'
 require 'rails3-jquery-autocomplete'
 
