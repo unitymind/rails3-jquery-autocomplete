@@ -41,7 +41,6 @@ module Rails3JQueryAutocomplete
           items = {}
         end
 
-        render :json => Yajl::Encoder.encode(json_for_autocomplete(items, options[:display_value] ||= method))
         render :json => Yajl::Encoder.encode(json_for_autocomplete(items, options[:display_value] ||= method, options[:extra_data]))
       end
     end
